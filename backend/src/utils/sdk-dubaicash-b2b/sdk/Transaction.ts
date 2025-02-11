@@ -7,165 +7,167 @@ import { UserRequest } from "../../../interfaces/UserRequest";
 import { gerarNumeroAleatorio } from "../../gerarNumeroAleatorio";
 
 export class Transactions {
-   private sign: sign;
+  private sign: sign;
 
-   constructor(sign: sign) {
-      this.sign = sign;
-   }
+  constructor(sign: sign) {
+    this.sign = sign;
+  }
 
-   async pix(
-      body: CreateTransfer,
-      id: number,
-      cpfCnpj?: string
-   ): Promise<{ status: number; data: any }> {
-      const header = await this.sign.header();
-      const url: string = process.env.URL_API as string;
-      const randomNumber = gerarNumeroAleatorio();
-      const externalId = id + "/" + randomNumber;
-      const document = cpfCnpj;
-      try {
-         const result = await axios.post(
-            url + "/v1/customers/pix/withdraw",
-            {
-               externalId: externalId,
-               key: body.key,
-               documentNumber: document || "",
-               amount: body.amount,
-               memo: "cashout",
-            },
-            header
-         );
-         return result;
-      } catch (error) {
-         const err = error as any;
-         console.log(err.response.data);
+  async pix(
+    body: CreateTransfer,
+    id: number,
+    cpfCnpj?: string
+  ): Promise<{ status: number; data: any }> {
+    const header = await this.sign.header();
+    const url: string = process.env.URL_API as string;
+    const randomNumber = gerarNumeroAleatorio();
+    const externalId = id + "/" + randomNumber;
+    const document = cpfCnpj;
+    try {
+      const result = await axios.post(
+        url + "/v1/customers/pix/withdraw",
+        {
+          externalId: externalId,
+          key: body.key,
+          documentNumber: document || "",
+          amount: body.amount,
+          memo: "cashout",
+        },
+        header
+      );
+      console.log(result);
 
-         return {
-            status: err.response.status || 400,
-            data: err.response.data
-               ? err.response.data
-               : { status: "ocorreu um erro" },
-         };
-      }
-   }
+      return result;
+    } catch (error) {
+      const err = error as any;
+      console.log(err.response.data);
 
-   async pixCopiaCola(emv: string): Promise<{ status: number; data: any }> {
-      const header = await this.sign.header();
-      const url: string = process.env.URL_API as string;
+      return {
+        status: err.response.status || 400,
+        data: err.response.data
+          ? err.response.data
+          : { status: "ocorreu um erro" },
+      };
+    }
+  }
 
-      try {
-         const result = await axios.post(
-            url + "/v1/customers/pix/decode-brcode",
-            {
-               emv: emv,
-            },
-            header
-         );
-         return result;
-      } catch (error) {
-         const err = error as any;
-         console.log(err.response.data);
+  async pixCopiaCola(emv: string): Promise<{ status: number; data: any }> {
+    const header = await this.sign.header();
+    const url: string = process.env.URL_API as string;
 
-         return {
-            status: err.response.status || 400,
-            data: err.response.data
-               ? err.response.data
-               : { status: "ocorreu um erro" },
-         };
-      }
-   }
+    try {
+      const result = await axios.post(
+        url + "/v1/customers/pix/decode-brcode",
+        {
+          emv: emv,
+        },
+        header
+      );
+      return result;
+    } catch (error) {
+      const err = error as any;
+      console.log(err.response.data);
 
-   async ConsultarChave(chave: string): Promise<{ status: number; data: any }> {
-      const header = await this.sign.header();
-      const url: string = process.env.URL_API as string;
-      try {
-         const result = await axios.get(
-            url + `/v1/customers/pix/pix-search?dict=${chave}`,
-            header
-         );
+      return {
+        status: err.response.status || 400,
+        data: err.response.data
+          ? err.response.data
+          : { status: "ocorreu um erro" },
+      };
+    }
+  }
 
-         return result;
-      } catch (error) {
-         const err = error as any;
-         console.log(err.response.data);
+  async ConsultarChave(chave: string): Promise<{ status: number; data: any }> {
+    const header = await this.sign.header();
+    const url: string = process.env.URL_API as string;
+    try {
+      const result = await axios.get(
+        url + `/v1/customers/pix/pix-search?dict=${chave}`,
+        header
+      );
 
-         return {
-            status: err.response.status || 400,
-            data: err.response.data
-               ? err.response.data
-               : { status: "ocorreu um erro" },
-         };
-      }
-   }
+      return result;
+    } catch (error) {
+      const err = error as any;
+      console.log(err.response.data);
 
-   async CreateQR(
-      body: CreateQR,
-      id?: number
-   ): Promise<{ status: number; data: any }> {
-      const header = await this.sign.header();
-      const url: string = process.env.URL_API as string;
-      const randomNumber = gerarNumeroAleatorio();
-      const externalId = id + "/" + randomNumber;
+      return {
+        status: err.response.status || 400,
+        data: err.response.data
+          ? err.response.data
+          : { status: "ocorreu um erro" },
+      };
+    }
+  }
 
-      const document = body.cpf;
+  async CreateQR(
+    body: CreateQR,
+    id?: number
+  ): Promise<{ status: number; data: any }> {
+    const header = await this.sign.header();
+    const url: string = process.env.URL_API as string;
+    const randomNumber = gerarNumeroAleatorio();
+    const externalId = id + "/" + randomNumber;
 
-      try {
-         const result = await axios.post(
-            url + `/v1/customers/pix/create-immediate-qrcode`,
-            {
-               externalId: externalId,
-               amount: body.amount,
-               document: "61872818021",
-               identification: "Recarga via QRCode",
-               description: externalId,
-               name: "Rodrigo Ferraz",
-               expire: 3600,
-            },
-            header
-         );
+    const document = body.cpf;
 
-         return result;
-      } catch (error) {
-         const err = error as any;
-         console.log(err.response.data);
+    try {
+      const result = await axios.post(
+        url + `/v1/customers/pix/create-immediate-qrcode`,
+        {
+          externalId: externalId,
+          amount: body.amount,
+          document: "61872818021",
+          identification: "Recarga via QRCode",
+          description: externalId,
+          name: "Rodrigo Ferraz",
+          expire: 3600,
+        },
+        header
+      );
 
-         return {
-            status: err.response.status || 400,
-            data: err.response.data
-               ? err.response.data
-               : { status: "ocorreu um erro" },
-         };
-      }
-   }
-   async Extrato(page?: number): Promise<{ status: number; data: any }> {
-      const header = await this.sign.header();
-      const url: string = process.env.URL_API as string;
-      const today = new Date();
-      const dateTo = today.toISOString().split("T")[0];
+      return result;
+    } catch (error) {
+      const err = error as any;
+      console.log(err.response.data);
 
-      try {
-         const result = await axios.post(
-            url + `/v1/customers/account/extract`,
-            {
-               dateFrom: "2022-01-27",
-               dateTo: dateTo,
-               limitPerPage: 50,
-               page: page || 1,
-            },
-            header
-         );
+      return {
+        status: err.response.status || 400,
+        data: err.response.data
+          ? err.response.data
+          : { status: "ocorreu um erro" },
+      };
+    }
+  }
+  async Extrato(page?: number): Promise<{ status: number; data: any }> {
+    const header = await this.sign.header();
+    const url: string = process.env.URL_API as string;
+    const today = new Date();
+    const dateTo = today.toISOString().split("T")[0];
 
-         return result;
-      } catch (error) {
-         const err = error as any;
-         console.log(err.response.data);
+    try {
+      const result = await axios.post(
+        url + `/v1/customers/account/extract`,
+        {
+          dateFrom: "2022-01-27",
+          dateTo: dateTo,
+          limitPerPage: 50,
+          page: page || 1,
+        },
+        header
+      );
 
-         return {
-            status: err.response.status || 400,
-            data: err.response.data
-               ? err.response.data
-               : { status: "ocorreu um erro" },
-         };
-      }
-   }
+      return result;
+    } catch (error) {
+      const err = error as any;
+      console.log(err.response.data);
+
+      return {
+        status: err.response.status || 400,
+        data: err.response.data
+          ? err.response.data
+          : { status: "ocorreu um erro" },
+      };
+    }
+  }
 }
